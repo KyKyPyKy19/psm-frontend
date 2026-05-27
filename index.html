@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PsychMonitor — система мониторинга физиологических маркеров для психотерапевтов на основе данных Garmin.">
+  <meta name="theme-color" content="#2D5A3D">
+  <title>PsychMonitor — Мониторинг физиологических маркеров</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232D5A3D'/%3E%3Cpath d='M26 16h-4l-3 8-4-16-3 8H6' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo">
+      <div class="sidebar__logo-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <span class="sidebar__logo-text">PsychMonitor</span>
+    </div>
+
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item sidebar__nav-item--active" data-page="dashboard" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Обзор
+      </button>
+      <button class="sidebar__nav-item" data-page="clients" id="nav-clients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Клиенты
+        <span class="sidebar__nav-badge hidden" id="nav-clients-badge">0</span>
+      </button>
+      <button class="sidebar__nav-item" data-page="analytics" id="nav-analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Аналитика
+      </button>
+      <button class="sidebar__nav-item" data-page="settings" id="nav-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Настройки
+      </button>
+    </nav>
+
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar">Д-И</div>
+      <div class="sidebar__user-info">
+        <div class="sidebar__user-name">Д-р Иванова</div>
+        <div class="sidebar__user-role">Психолог</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileMenu()"></div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+
+    <div class="mobile-header" id="mobile-header">
+      <button class="mobile-header__hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span class="mobile-header__title">PsychMonitor</span>
+    </div>
+
+    <!-- ==================== PAGE: DASHBOARD ==================== -->
+    <section class="page-section page-section--active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Обзор</h1>
+        <div class="page-header__right">
+          <span class="time-badge"><span class="live-dot"></span> Данные актуальны</span>
+        </div>
+      </div>
+
+      <div id="dashboard-error"></div>
+
+      <div class="dashboard-stats">
+        <div class="dash-stat-card">
+          <div class="label">Активных клиентов</div>
+          <div class="metric-number" id="dash-active-clients">—</div>
+          <div class="metric-subtitle">на мониторинге</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="label">Средний стресс группы</div>
+          <div class="metric-number" id="dash-avg-stress">—</div>
+          <div class="metric-subtitle">из 100 · сегодня</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="label">Стресс-эпизодов</div>
+          <div class="metric-number" id="dash-episodes">—</div>
+          <div class="metric-subtitle">за последние 24ч</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="label">Алертов</div>
+          <div class="metric-number text-danger" id="dash-alerts">—</div>
+          <div class="metric-subtitle">требуют внимания</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card__header">
+            <h3>Клиенты, требующие внимания</h3>
+          </div>
+          <div class="card__body">
+            <div class="alert-timeline" id="dashboard-alerts-list">
+              <div class="loading-state">Загрузка…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <h3>Клиенты — быстрый обзор</h3>
+            <span class="card__link" onclick="navigateTo('clients')">Все клиенты →</span>
+          </div>
+          <div class="card__body">
+            <div class="alert-timeline" id="dashboard-clients-list">
+              <div class="loading-state">Загрузка…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE: CLIENTS LIST ==================== -->
+    <section class="page-section" id="page-clients">
+      <div class="page-header">
+        <h1>Клиенты</h1>
+        <div class="page-header__right">
+          <div class="search-bar">
+            <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="search-bar__input" type="text" placeholder="Поиск клиента..." id="client-search" oninput="filterClients(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <div id="clients-error"></div>
+      <div class="clients-grid" id="clients-grid">
+        <div class="loading-state">Загрузка клиентов…</div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE: CLIENT DETAIL ==================== -->
+    <section class="page-section" id="page-client-detail">
+      <div class="breadcrumbs">
+        <a class="breadcrumbs__link" href="#" onclick="navigateTo('clients'); return false;">Клиенты</a>
+        <span class="breadcrumbs__sep">›</span>
+        <span class="breadcrumbs__current" id="detail-breadcrumb-name">Клиент</span>
+      </div>
+
+      <div class="page-header">
+        <div class="page-header__left">
+          <div class="client-profile">
+            <div class="client-profile__avatar" id="detail-avatar">—</div>
+            <div class="client-profile__info">
+              <h1 id="detail-name">Клиент</h1>
+              <div class="client-profile__meta">
+                <span class="badge badge--active" id="detail-status">Активен</span>
+                <span id="detail-meta">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-header__right">
+          <button class="btn btn--accent" onclick="navigateTo('analytics')">Графики</button>
+        </div>
+      </div>
+
+      <div id="detail-error"></div>
+
+      <div class="metrics-grid" id="detail-metrics" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="metric-card metric-card--stress">
+          <div class="label">Средний стресс</div>
+          <div class="metric-number" id="mc-stress">—</div>
+          <div class="metric-subtitle">из 100 · сегодня</div>
+          <div class="metric-change metric-change--neutral" id="mc-stress-change"></div>
+        </div>
+        <div class="metric-card metric-card--hr">
+          <div class="label">Пульс (сред)</div>
+          <div class="metric-number" id="mc-hr">—</div>
+          <div class="metric-subtitle">уд/мин · сегодня</div>
+          <div class="metric-change metric-change--neutral" id="mc-hr-change"></div>
+        </div>
+        <div class="metric-card metric-card--bb">
+          <div class="label">Body Battery</div>
+          <div class="metric-number" id="mc-bb">—</div>
+          <div class="metric-subtitle">из 100 · текущий</div>
+          <div class="metric-change metric-change--neutral" id="mc-bb-change"></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card__header">
+            <h3>Зоны стресса (сегодня)</h3>
+          </div>
+          <div class="card__body">
+            <div class="stress-zones" id="stress-zones-container"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <h3>Стресс-эпизоды</h3>
+          </div>
+          <div class="card__body">
+            <div class="episodes" id="episodes-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card__header">
+          <h3>Триггеры стресса (NLP-анализ)</h3>
+        </div>
+        <div class="card__body">
+          <div id="trigger-analysis-container"></div>
+        </div>
+      </div>
+
+      <button class="detail-toggle mt-2" id="detail-toggle-btn" onclick="toggleDetailPanel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <span id="detail-toggle-text">Показать детализацию</span>
+        <span class="caption" style="margin-left: 4px;">· Min/Max пульс, BB, стресс, аномалии</span>
+      </button>
+
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-metrics-grid">
+          <div class="detail-metric">
+            <div class="detail-metric__label">Пульс Min / Max</div>
+            <div class="detail-metric__value" id="dm-hr-range">—</div>
+            <div class="detail-metric__range">уд/мин за сегодня</div>
+          </div>
+          <div class="detail-metric">
+            <div class="detail-metric__label">Стресс Min / Max</div>
+            <div class="detail-metric__value" id="dm-stress-range">—</div>
+            <div class="detail-metric__range">за сегодня</div>
+          </div>
+          <div class="detail-metric">
+            <div class="detail-metric__label">Аномалии</div>
+            <div class="detail-metric__value" id="dm-anomalies">—</div>
+            <div class="detail-metric__range">за сегодня</div>
+          </div>
+          <div class="detail-metric">
+            <div class="detail-metric__label">Эпизодов сегодня</div>
+            <div class="detail-metric__value" id="dm-episodes-today">—</div>
+            <div class="detail-metric__range">стресс-эпизоды</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card__header">
+          <h3>Ежедневная сводка</h3>
+        </div>
+        <div class="card__body">
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Ср. стресс</th>
+                  <th>Ср. пульс</th>
+                  <th>BB</th>
+                  <th>Эпизоды</th>
+                  <th>Шаги</th>
+                  <th>Калории</th>
+                  <th>Акт. мин.</th>
+                </tr>
+              </thead>
+              <tbody id="weekly-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE: ANALYTICS ==================== -->
+    <section class="page-section" id="page-analytics">
+      <div class="breadcrumbs">
+        <a class="breadcrumbs__link" href="#" onclick="navigateTo('clients'); return false;">Клиенты</a>
+        <span class="breadcrumbs__sep">›</span>
+        <a class="breadcrumbs__link" href="#" onclick="navigateTo('client-detail'); return false;" id="analytics-breadcrumb-name">Клиент</a>
+        <span class="breadcrumbs__sep">›</span>
+        <span class="breadcrumbs__current">Аналитика</span>
+      </div>
+
+      <div class="page-header">
+        <h1 id="analytics-title">Аналитика</h1>
+      </div>
+
+      <div id="analytics-error"></div>
+
+      <div class="card mb-2">
+        <div class="card__header"><h3>Динамика стресса</h3></div>
+        <div class="card__body">
+          <div class="chart-container" style="height: 280px;">
+            <canvas id="analytics-stress-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col mb-2">
+        <div class="card">
+          <div class="card__header"><h3>Пульс (HR)</h3></div>
+          <div class="card__body"><div class="chart-container"><canvas id="analytics-hr-chart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card__header"><h3>Body Battery</h3></div>
+          <div class="card__body"><div class="chart-container"><canvas id="analytics-bb-chart"></canvas></div></div>
+        </div>
+      </div>
+
+      <div class="card mb-2">
+        <div class="card__header">
+          <h3>Динамика стресс-эпизодов</h3>
+          <span class="caption">наведите для деталей по триггерам</span>
+        </div>
+        <div class="card__body">
+          <div class="chart-container" style="height: 260px;"><canvas id="analytics-episodes-chart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card__header"><h3>Шаги</h3></div>
+          <div class="card__body"><div class="chart-container"><canvas id="analytics-steps-chart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card__header"><h3>Калории</h3></div>
+          <div class="card__body"><div class="chart-container"><canvas id="analytics-calories-chart"></canvas></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE: SETTINGS ==================== -->
+    <section class="page-section" id="page-settings">
+      <div class="page-header"><h1>Настройки</h1></div>
+
+      <div class="card mb-2">
+        <div class="card__body">
+          <div class="settings__section">
+            <h3>Профиль специалиста</h3>
+            <div class="settings__row">
+              <div><div class="settings__label">Имя</div><div class="settings__label-desc">Отображается для клиентов</div></div>
+              <input class="settings__input" type="text" value="Д-р Иванова Полина">
+            </div>
+            <div class="settings__row">
+              <div><div class="settings__label">Email</div></div>
+              <input class="settings__input" type="email" value="ivanova@psychmonitor.ru">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__body">
+          <div class="settings__section">
+            <h3>Интеграция Garmin</h3>
+            <div class="settings__row">
+              <div><div class="settings__label">Garmin Connect</div><div class="settings__label-desc">Статус подключения к источнику данных</div></div>
+              <span class="badge badge--active">Подключено</span>
+            </div>
+            <div class="settings__row">
+              <div><div class="settings__label">Интервал синхронизации</div><div class="settings__label-desc">Как часто обновлять данные</div></div>
+              <select class="settings__input" style="width: 150px;">
+                <option>Каждые 5 мин</option>
+                <option selected>Каждые 15 мин</option>
+                <option>Каждый час</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
