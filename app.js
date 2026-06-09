@@ -462,8 +462,8 @@ function renderTriggerAnalysis(episodes) {
       const tg = TRIGGER_GROUPS[key] || TRIGGER_GROUPS.unknown;
       html += `
         <div class="top-trigger">
-          <div class="top-trigger__rank">${medals[i]}</div>
-          <div class="top-trigger__dot"></div>
+          <div class="top-trigger__rank" style="background:${tg.color};">${medals[i]}</div>
+          <div class="top-trigger__dot" style="background:${tg.color};"></div>
           <div class="top-trigger__name">${tg.label}</div>
           <div class="top-trigger__count">${count} эпизодов</div>
         </div>`;

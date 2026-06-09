@@ -422,13 +422,9 @@ h3, .h3 { font-family: 'DM Sans', 'Helvetica', sans-serif; font-size: 14px; font
 .top-trigger { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface-alt); border-radius: 8px; transition: all var(--transition); }
 .top-trigger:hover { background: var(--accent-light); }
 .top-trigger__rank { width: 24px; height: 24px; border-radius: 50%; background: var(--text-primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.top-trigger:nth-child(1) .top-trigger__rank { background: #D4654A; }
-.top-trigger:nth-child(2) .top-trigger__rank { background: #E8B84D; }
-.top-trigger:nth-child(3) .top-trigger__rank { background: #7FB895; }
 .top-trigger__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--text-primary); }
-.top-trigger:nth-child(1) .top-trigger__dot { background: #D4654A; }
-.top-trigger:nth-child(2) .top-trigger__dot { background: #E8B84D; }
-.top-trigger:nth-child(3) .top-trigger__dot { background: #7FB895; }
+/* Цвета ранга и точки задаются инлайном из JS — по цвету категории, чтобы
+   и прогресс-бары слева, и кружок-ранг, и точка были визуально согласованы. */
 .top-trigger__name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-primary); }
 .top-trigger__count { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
 
