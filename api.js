@@ -31,7 +31,8 @@ const TRIGGER_GROUPS = {
   health:  { label: 'Здоровье',        color: '#5D8EC2', colorLight: 'rgba(93, 142, 194, 0.15)' },
   friends: { label: 'Друзья/Общение',  color: '#7FB895', colorLight: 'rgba(127, 184, 149, 0.15)' },
   social:  { label: 'Друзья/Общение',  color: '#7FB895', colorLight: 'rgba(127, 184, 149, 0.15)' },
-  finance: { label: 'Финансы',         color: '#9B7EC2', colorLight: 'rgba(155, 126, 194, 0.15)' },
+  finance:   { label: 'Финансы',         color: '#9B7EC2', colorLight: 'rgba(155, 126, 194, 0.15)' },
+  financial: { label: 'Финансы',         color: '#9B7EC2', colorLight: 'rgba(155, 126, 194, 0.15)' },
   unknown: { label: 'Не распознано',   color: '#9B978E', colorLight: 'rgba(155, 151, 142, 0.15)' },
   null:    { label: 'Нет ответа',      color: '#C8C5BD', colorLight: 'rgba(200, 197, 189, 0.15)' },
 };
