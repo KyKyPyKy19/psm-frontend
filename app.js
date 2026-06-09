@@ -276,15 +276,41 @@ async function renderClientDetail() {
 }
 
 function renderSummaryMetrics(s) {
+  // Если бэк не вернул среднее за сегодня (клиент не синхронизировал часы),
+  // подменяем на последнее доступное значение из daily-analytics и меняем
+  // подпись "сегодня" → "DD мес". Изменение к вчера в этом случае скрываем.
+  const stress = pickMetricWithFallback(s.avg_stress, 'stress_avg');
+  const hr     = pickMetricWithFallback(s.avg_hr,     'hr_avg');
+
   document.getElementById('mc-stress').textContent =
-    s.avg_stress === null || s.avg_stress === undefined ? '—' : Math.round(s.avg_stress);
+    stress.value === null ? '—' : Math.round(stress.value);
   document.getElementById('mc-hr').textContent =
-    s.avg_hr === null || s.avg_hr === undefined ? '—' : Math.round(s.avg_hr);
+    hr.value === null ? '—' : Math.round(hr.value);
   document.getElementById('mc-bb').textContent = val(s.current_bb);
 
-  setChange('mc-stress-change', s.stress_change, true);
-  setChange('mc-hr-change', s.hr_change, true);
+  document.getElementById('mc-stress-sub').textContent = `из 100 · ${stress.dateLabel}`;
+  document.getElementById('mc-hr-sub').textContent     = `уд/мин · ${hr.dateLabel}`;
+
+  // change/динамика к вчера осмысленна только если значение за сегодня
+  setChange('mc-stress-change', stress.fromToday ? s.stress_change : null, true);
+  setChange('mc-hr-change',     hr.fromToday     ? s.hr_change     : null, true);
   setChange('mc-bb-change', s.bb_change, false);
+}
+
+// Берёт значение за сегодня; если null — ищет свежайшее не-null в analyticsCache.
+function pickMetricWithFallback(todayValue, field) {
+  if (todayValue !== null && todayValue !== undefined) {
+    return { value: todayValue, fromToday: true, dateLabel: 'сегодня' };
+  }
+  // analyticsCache отсортирован ASC по дате — идём с конца к началу.
+  for (let i = analyticsCache.length - 1; i >= 0; i--) {
+    const row = analyticsCache[i];
+    const v = row[field];
+    if (v !== null && v !== undefined) {
+      return { value: v, fromToday: false, dateLabel: dateStrShort(row.date) };
+    }
+  }
+  return { value: null, fromToday: false, dateLabel: 'нет данных' };
 }
 
 function setChange(elId, value, invertColor) {
