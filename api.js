@@ -36,6 +36,28 @@ const TRIGGER_GROUPS = {
   null:    { label: 'Нет ответа',      color: '#C8C5BD', colorLight: 'rgba(200, 197, 189, 0.15)' },
 };
 
+/* label -> канонический ключ (первый встреченный с этим label).
+   Нужно, чтобы friends/social и любые другие синонимы из переобученной модели
+   считались как одна группа в "Топ триггерах". */
+const TRIGGER_LABEL_TO_KEY = (() => {
+  const map = {};
+  for (const [key, info] of Object.entries(TRIGGER_GROUPS)) {
+    if (!map[info.label]) map[info.label] = key;
+  }
+  return map;
+})();
+
+// Приводит сырое значение stress_category из API к каноническому ключу TRIGGER_GROUPS.
+// - null/'' -> null  (нет ответа клиента)
+// - известный ключ -> канонический ключ для его label
+// - незнакомый ключ -> 'unknown'  (модель вернула класс, которого нет во фронте)
+function canonicalTriggerKey(rawKey) {
+  if (rawKey === null || rawKey === undefined || rawKey === '') return null;
+  const info = TRIGGER_GROUPS[rawKey];
+  if (!info) return 'unknown';
+  return TRIGGER_LABEL_TO_KEY[info.label] || rawKey;
+}
+
 /* ===== Formatting / helpers ===== */
 
 // Значение или прочерк, если null/undefined.

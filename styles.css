@@ -425,7 +425,10 @@ h3, .h3 { font-family: 'DM Sans', 'Helvetica', sans-serif; font-size: 14px; font
 .top-trigger:nth-child(1) .top-trigger__rank { background: #D4654A; }
 .top-trigger:nth-child(2) .top-trigger__rank { background: #E8B84D; }
 .top-trigger:nth-child(3) .top-trigger__rank { background: #7FB895; }
-.top-trigger__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.top-trigger__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--text-primary); }
+.top-trigger:nth-child(1) .top-trigger__dot { background: #D4654A; }
+.top-trigger:nth-child(2) .top-trigger__dot { background: #E8B84D; }
+.top-trigger:nth-child(3) .top-trigger__dot { background: #7FB895; }
 .top-trigger__name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-primary); }
 .top-trigger__count { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
 

@@ -338,7 +338,8 @@ function renderEpisodes(episodes) {
 
   container.innerHTML = episodes.map(ep => {
     const level = episodeLevel(ep.peak_stress);
-    const triggerKey = ep.stress_category || 'null';
+    const canonical = canonicalTriggerKey(ep.stress_category);
+    const triggerKey = canonical || 'null';
     const triggerInfo = TRIGGER_GROUPS[triggerKey];
     const hasComment = ep.user_description !== null && ep.user_description !== undefined && ep.user_description !== '';
 
@@ -347,7 +348,7 @@ function renderEpisodes(episodes) {
     const desc = `Стресс ${val(Math.round(ep.avg_stress))}–${val(ep.peak_stress)} · пульс до ${val(ep.peak_hr)} уд/мин`;
 
     let triggerBadge = '';
-    if (ep.stress_category && triggerInfo) {
+    if (canonical && triggerInfo) {
       triggerBadge = `<div style="margin-top:4px;"><span class="trigger-badge" style="background:${triggerInfo.colorLight}; color:${triggerInfo.color};">${triggerInfo.label}</span></div>`;
     }
 
@@ -407,8 +408,8 @@ function renderTriggerAnalysis(episodes) {
   const total = episodes.length;
 
   episodes.forEach(ep => {
-    if (!ep.stress_category) { nullCount++; return; }
-    const key = ep.stress_category;
+    const key = canonicalTriggerKey(ep.stress_category);
+    if (!key) { nullCount++; return; }
     triggerTotals[key] = (triggerTotals[key] || 0) + 1;
   });
 
@@ -462,7 +463,7 @@ function renderTriggerAnalysis(episodes) {
       html += `
         <div class="top-trigger">
           <div class="top-trigger__rank">${medals[i]}</div>
-          <div class="top-trigger__dot" style="background:${tg.color};"></div>
+          <div class="top-trigger__dot"></div>
           <div class="top-trigger__name">${tg.label}</div>
           <div class="top-trigger__count">${count} эпизодов</div>
         </div>`;
