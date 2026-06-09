@@ -18,7 +18,10 @@ const API = (() => {
     dashboard: () => get('/api/dashboard'),
     clients: () => get('/api/clients'),
     clientSummary: (id) => get(`/api/clients/${encodeURIComponent(id)}/summary`),
-    dailyAnalytics: (id) => get(`/api/clients/${encodeURIComponent(id)}/daily-analytics`),
+    dailyAnalytics: (id, days) => {
+      const path = `/api/clients/${encodeURIComponent(id)}/daily-analytics`;
+      return get(days ? `${path}?days=${days}` : path);
+    },
     timeline: (id) => get(`/api/clients/${encodeURIComponent(id)}/timeline`),
     episodes: (id) => get(`/api/stress-episodes/${encodeURIComponent(id)}`),
   };

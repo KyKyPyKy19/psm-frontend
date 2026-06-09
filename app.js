@@ -7,6 +7,7 @@ let clientsCache = [];
 let episodesCache = [];
 let analyticsCache = [];
 let chartInstances = {};
+let currentAnalyticsDays = 30;
 
 // =========================================
 // NAVIGATION
@@ -529,7 +530,7 @@ async function renderAnalytics() {
   document.getElementById('analytics-breadcrumb-name').textContent = id;
 
   try {
-    const analytics = (await API.dailyAnalytics(id) || []).slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+    const analytics = (await API.dailyAnalytics(id, currentAnalyticsDays) || []).slice().sort((a, b) => (a.date < b.date ? -1 : 1));
     analyticsCache = analytics;
     setTimeout(() => {
       renderLineChart('analytics-stress-chart', analytics, 'stress_avg', 'Средний стресс', '#E8B84D', 'rgba(232,184,77,0.12)', 'stress_max', 'Макс. стресс');
@@ -541,6 +542,30 @@ async function renderAnalytics() {
     }, 50);
   } catch (err) {
     showError('analytics-error', err);
+  }
+}
+
+// Переключатель периода + сброс зума для всех графиков аналитики.
+function setupAnalyticsToolbar() {
+  const group = document.getElementById('analytics-period-group');
+  if (group) {
+    group.addEventListener('click', e => {
+      const btn = e.target.closest('.period-btn');
+      if (!btn || !btn.dataset.days) return;
+      const days = parseInt(btn.dataset.days, 10);
+      if (!days || days === currentAnalyticsDays) return;
+      currentAnalyticsDays = days;
+      group.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('period-btn--active', b === btn));
+      renderAnalytics();
+    });
+  }
+  const reset = document.getElementById('analytics-reset-zoom');
+  if (reset) {
+    reset.addEventListener('click', () => {
+      Object.values(chartInstances).forEach(ch => {
+        if (ch && typeof ch.resetZoom === 'function') ch.resetZoom();
+      });
+    });
   }
 }
 
@@ -591,6 +616,17 @@ function getChartOptions(yLabel) {
         labels: { font: { family: "'DM Sans', sans-serif", size: 12 }, color: '#6B6860', boxWidth: 10, boxHeight: 10, borderRadius: 5, useBorderRadius: true, padding: 16 },
       },
       tooltip: { backgroundColor: '#1A1A1A', titleFont: { family: "'DM Sans', sans-serif", size: 13 }, bodyFont: { family: "'DM Sans', sans-serif", size: 12 }, padding: 10, cornerRadius: 8, displayColors: true, boxWidth: 8, boxHeight: 8, boxPadding: 4 },
+      // Зум/пан по горизонтали — для всех графиков аналитики.
+      // Активируется только если плагин подгрузился (на странице дашборда он тоже разрешён, но без вреда).
+      zoom: {
+        pan: { enabled: true, mode: 'x', modifierKey: 'shift' },
+        zoom: {
+          wheel: { enabled: true, modifierKey: 'ctrl' },
+          drag: { enabled: true, backgroundColor: 'rgba(212, 101, 74, 0.12)', borderColor: '#D4654A', borderWidth: 1, threshold: 6 },
+          mode: 'x',
+        },
+        limits: { x: { minRange: 1 } },
+      },
     },
     scales: {
       x: { grid: { display: false }, ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, color: '#9B978E' } },
@@ -609,5 +645,6 @@ function destroyChart(id) {
 // =========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupAnalyticsToolbar();
   renderDashboard();
 });

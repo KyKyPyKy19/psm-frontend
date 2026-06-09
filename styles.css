@@ -490,3 +490,18 @@ h3, .h3 { font-family: 'DM Sans', 'Helvetica', sans-serif; font-size: 14px; font
 .mb-3 { margin-bottom: 24px; }
 .gap-row { display: flex; gap: 12px; flex-wrap: wrap; }
 .hidden { display: none !important; }
+
+/* ============ Block: analytics-toolbar ============ */
+.analytics-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.analytics-toolbar__group { display: inline-flex; gap: 2px; background: var(--surface-alt); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+.analytics-toolbar__actions { display: inline-flex; align-items: center; gap: 12px; }
+.analytics-toolbar__hint { font-size: 11.5px; color: var(--text-tertiary, #9B978E); }
+.period-btn { padding: 6px 14px; border: none; background: transparent; color: var(--text-secondary); font: inherit; font-size: 12.5px; font-weight: 500; border-radius: 7px; cursor: pointer; transition: background 0.15s, color 0.15s; line-height: 1.2; }
+.period-btn:hover { color: var(--text-primary); background: rgba(0,0,0,0.04); }
+.period-btn--active { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.period-btn--active:hover { background: var(--surface); }
+.period-btn--ghost { background: var(--surface); border: 1px solid var(--border); padding: 6px 10px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+.period-btn--ghost:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent-light); }
+@media (max-width: 720px) {
+  .analytics-toolbar__hint { display: none; }
+}
